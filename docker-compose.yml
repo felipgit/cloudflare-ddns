@@ -1,0 +1,36 @@
+version: '3'
+services:
+  db:
+    image: postgres:13
+    restart: always
+    environment:
+      - POSTGRES_USER=yourdbuser
+      - POSTGRES_PASSWORD=yourdbpassword
+      - POSTGRES_DB=yourdbname
+    volumes:
+      - data:/var/lib/postgresql/data
+  ddns:
+    image: felipdocker/cloudflare-ddns
+    restart: always
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URI=postgresql://yourdbuser:yourdbpassword@db/yourdbname
+      - CLOUDFLARE_API_KEY=yOuRclOUDfLAreAPItoken
+      - CLOUDFLARE_ZONE_ID=S0m3c00Lz0N31Dhere
+    ports:
+      - 5000:5000
+    volumes:
+      - ./app.py:/app/app.py
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
+      - db
+    environment:
+      - ADMINER_DEFAULT_SERVER=db 
+      - ADMINER_DESIGN=hydra
+    ports:
+      - 8080:8080
+volumes:
+  data:
