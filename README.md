@@ -28,11 +28,3 @@ Before you begin, make sure you have the following prerequisites in place:
     ```bash
     curl https://ddns.example.com/update?domain=sub.example.com&ip=127.0.0.1&token=tokenprovidedfrombefore
     ```
-# TODO
-- Add labels to docker-compose.yml
-- Add auth to /list
-- Add updated when calling /update
-- Method to create domains too if missing?
-- Change flask to production
-- Remove debuging
-- Auto build to docker
