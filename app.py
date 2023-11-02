@@ -59,12 +59,7 @@ def generate_uuid():
     return str(uuid.uuid4())
 
 # Function to add a new domain and generate a UUID
-def add_domain():
-    domain = request.args.get("domain")
-
-    if not domain:
-        return jsonify({"status": "BAD", "reason": "Domain is missing"}), 400
-
+def add_domain_to_db(domain):
     # Check if the domain already exists
     conn = psycopg2.connect(os.getenv("DATABASE_URI"))
     cur = conn.cursor()
@@ -164,9 +159,9 @@ def update_ddns():
     token = request.args.get("token")
 
     if not (domain and ip and token):
-        return "ERROR: INVALID INPUT", 400
+        return jsonify({"status": "BAD", "reason": "Invalid input received"}), 400
     if not is_valid_token(token, domain):
-        return "ERROR: DDNS AUTH FAILED", 403
+        return jsonify({"status": "BAD", "reason": "authentication failed due to invalid token"}), 403
     success, message = update_cloudflare_dns(domain, ip)
     if success:
         update_timestamp_and_ip(domain, ip)
@@ -178,7 +173,11 @@ def update_ddns():
 # Route for adding a new domain
 @app.route("/add_domain", methods=["GET"])
 def add_domain():
-    response, status_code = add_domain()
+    domain = request.args.get("domain")
+    if not domain:
+        return jsonify({"status": "BAD", "reason": "Domain is missing"}), 400
+
+    response, status_code = add_domain_to_db(domain)
     return response, status_code
 
 # Route to add list current domains with no secrets
