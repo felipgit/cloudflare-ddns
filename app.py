@@ -3,6 +3,7 @@ import psycopg2
 import requests
 import uuid
 import os
+from datetime import datetime
 
 #DEBUG
 #import logging
@@ -34,6 +35,24 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
+
+def update_timestamp_and_ip(domain, new_ip):
+    conn = psycopg2.connect(DATABASE_URI)
+    cur = conn.cursor()
+
+    # Update the IP and timestamp for the given domain
+    try:
+        # First, fetch the current timestamp
+        timestamp = datetime.now()
+
+        # Update the "ip" and "updated" columns for the domain
+        cur.execute("UPDATE ddns SET ip = %s, updated = %s WHERE domain = %s", (new_ip, timestamp, domain))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        raise e  # You can handle the exception as needed
 
 # Function to generate a standard UUID
 def generate_uuid():
@@ -150,6 +169,7 @@ def update_ddns():
         return "ERROR: DDNS AUTH FAILED", 403
     success, message = update_cloudflare_dns(domain, ip)
     if success:
+        update_timestamp_and_ip(domain, ip)
         return f'{{"status": "OK", "message": "{message}"}}'
     else:
         # Return the error message and a status code indicating the error
