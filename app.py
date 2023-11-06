@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_basicauth import BasicAuth
 import psycopg2
 import requests
 import uuid
@@ -10,6 +11,10 @@ from datetime import datetime
 #logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
+app.config['BASIC_AUTH_USERNAME'] = os.getenv('APP_USERNAME')
+app.config['BASIC_AUTH_PASSWORD'] = os.getenv('APP_PASSWORD')
+
+basic_auth = BasicAuth(app)
 
 # PostgreSQL database configuration
 DATABASE_URI = os.getenv("DATABASE_URI")
@@ -172,6 +177,7 @@ def update_ddns():
 
 # Route for adding a new domain
 @app.route("/add_domain", methods=["GET"])
+@basic_auth.required
 def add_domain():
     domain = request.args.get("domain")
     if not domain:
@@ -181,6 +187,7 @@ def add_domain():
     return response, status_code
 
 # Route to add list current domains with no secrets
+@basic_auth.required
 @app.route("/list", methods=["GET"])
 def list_domains():
     return "LIST OK"
