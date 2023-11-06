@@ -192,6 +192,12 @@ def add_domain():
 def list_domains():
     return "LIST OK"
 
+# Route to add list current domains with no secrets
+@basic_auth.required
+@app.route("/delete_domain", methods=["GET"])
+def delete_domain():
+    return "DELETE OK"
+
 if __name__ == "__main__":
     init_db()  # Initialize the database
     #app.run(host="0.0.0.0", port=5000)
