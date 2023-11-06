@@ -75,7 +75,7 @@ def add_domain_to_db(domain):
 
     if result:
         conn.close()
-        return jsonify({"status": "BAD", "reason": "Domain already exists"}), 400
+        return jsonify({"status": False, "message": "Domain already exists"}), 400
 
     # Generate a UUID string
     token = generate_uuid()
@@ -85,11 +85,11 @@ def add_domain_to_db(domain):
         cur.execute("INSERT INTO ddns (domain, token) VALUES (%s, %s)", (domain, token))
         conn.commit()
         conn.close()
-        return jsonify({"status": "OK", "token": token}), 200
+        return jsonify({"status": True, "token": token}), 200
     except Exception as e:
         conn.rollback()
         conn.close()
-        return jsonify({"status": "BAD", "reason": str(e)}), 500
+        return jsonify({"status": False, "message": str(e)}), 500
 
 def update_cloudflare_dns(domain, new_ip):
     success, record_identifier, record_content = get_zone_record_identifier(domain)
@@ -165,16 +165,16 @@ def update_ddns():
     token = request.args.get("token")
 
     if not (domain and ip and token):
-        return jsonify({"status": "BAD", "reason": "Invalid input received"}), 400
+        return jsonify({"status": False, "reason": "Invalid input received"}), 400
     if not is_valid_token(token, domain):
-        return jsonify({"status": "BAD", "reason": "authentication failed due to invalid token"}), 403
+        return jsonify({"status": False, "reason": "authentication failed due to invalid token"}), 403
     success, message = update_cloudflare_dns(domain, ip)
     if success:
         update_timestamp_and_ip(domain, ip)
-        return f'{{"status": "OK", "message": "{message}"}}'
+        return jsonify({"status": True, "message": message}), 200
     else:
         # Return the error message and a status code indicating the error
-        return f"{message}", 500
+        return jsonify({"status": False, "message": message}), 500
 
 # Route for adding a new domain
 @app.route("/add_domain", methods=["GET"])
@@ -182,7 +182,7 @@ def update_ddns():
 def add_domain():
     domain = request.args.get("domain")
     if not domain:
-        return jsonify({"status": "BAD", "reason": "Domain is missing"}), 400
+        return jsonify({"status": False, "reason": "Domain is missing"}), 400
 
     response, status_code = add_domain_to_db(domain)
     return response, status_code
@@ -191,13 +191,13 @@ def add_domain():
 @app.route("/list", methods=["GET"])
 @basic_auth.required
 def list_domains():
-    return "LIST OK"
+    return jsonify({"status": True, "message": "LIST OK"})
 
 # Route to add list current domains with no secrets
 @app.route("/delete_domain", methods=["GET"])
 @basic_auth.required
 def delete_domain():
-    return "DELETE OK"
+    return jsonify({"status": True, "message": "DELETE OK"})
 
 if __name__ == "__main__":
     init_db()  # Initialize the database
