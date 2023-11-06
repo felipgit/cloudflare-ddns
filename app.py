@@ -188,8 +188,8 @@ def add_domain():
     return response, status_code
 
 # Route to add list current domains with no secrets
-@basic_auth.required
 @app.route("/list", methods=["GET"])
+@basic_auth.required
 def list_domains():
     return "LIST OK"
 
