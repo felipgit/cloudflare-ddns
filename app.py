@@ -69,19 +69,19 @@ def add_domain_to_db(domain):
     conn = psycopg2.connect(DATABASE_URI)
     cur = conn.cursor()
 
-    # Check if the domain already exists
-    cur.execute("SELECT domain FROM ddns WHERE domain = %s", (domain,))
-    result = cur.fetchone()
-
-    if result:
-        conn.close()
-        return jsonify({"status": False, "message": "Domain already exists"}), 400
-
-    # Generate a UUID string
-    token = generate_uuid()
-
-    # Insert the domain and token into the database
     try:
+        # Check if the domain already exists
+        cur.execute("SELECT domain FROM ddns WHERE domain = %s", (domain,))
+        result = cur.fetchone()
+
+        if result:
+            conn.close()
+            return jsonify({"status": False, "message": "Domain already exists"}), 400
+
+        # Generate a UUID string
+        token = generate_uuid()
+
+        # Insert the domain and token into the database
         cur.execute("INSERT INTO ddns (domain, token) VALUES (%s, %s)", (domain, token))
         conn.commit()
         conn.close()
