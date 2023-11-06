@@ -235,7 +235,11 @@ def list_domains():
 @app.route("/delete_domain", methods=["GET"])
 @basic_auth.required
 def delete_domain():
-    return jsonify({"status": True, "message": "DELETE OK"})
+    domain = request.args.get("domain")
+    if not domain:
+        return jsonify({"status": False, "message": "Domain input is missing"}), 400
+
+    return delete_domain_from_db(domain)
 
 if __name__ == "__main__":
     init_db()  # Initialize the database
