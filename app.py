@@ -194,8 +194,8 @@ def list_domains():
     return "LIST OK"
 
 # Route to add list current domains with no secrets
-@basic_auth.required
 @app.route("/delete_domain", methods=["GET"])
+@basic_auth.required
 def delete_domain():
     return "DELETE OK"
 
