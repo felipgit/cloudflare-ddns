@@ -165,9 +165,9 @@ def update_ddns():
     token = request.args.get("token")
 
     if not (domain and ip and token):
-        return jsonify({"status": False, "reason": "Invalid input received"}), 400
+        return jsonify({"status": False, "message": "Invalid input received"}), 400
     if not is_valid_token(token, domain):
-        return jsonify({"status": False, "reason": "authentication failed due to invalid token"}), 403
+        return jsonify({"status": False, "message": "Authentication failed due to invalid token"}), 403
     success, message = update_cloudflare_dns(domain, ip)
     if success:
         update_timestamp_and_ip(domain, ip)
@@ -182,7 +182,7 @@ def update_ddns():
 def add_domain():
     domain = request.args.get("domain")
     if not domain:
-        return jsonify({"status": False, "reason": "Domain is missing"}), 400
+        return jsonify({"status": False, "message": "Domain is missing"}), 400
 
     response, status_code = add_domain_to_db(domain)
     return response, status_code
