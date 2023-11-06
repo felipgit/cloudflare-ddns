@@ -115,6 +115,20 @@ def list_domain_from_db():
     except Exception as e:
         return jsonify({"status": False, "message": str(e)})
 
+def delete_domain_from_db(domain):
+    try:
+        conn = psycopg2.connect(DATABASE_URI)
+        cur = conn.cursor()
+
+        # Delete the domain from the database based on the provided domain name
+        cur.execute("DELETE FROM ddns WHERE domain = %s", (domain,))
+        conn.commit()
+        conn.close()
+
+        return jsonify({"status": True, "message": f"Domain {domain} deleted successfully."})
+    except Exception as e:
+        return jsonify({"status": False, "message": str(e)})
+
 def update_cloudflare_dns(domain, new_ip):
     success, record_identifier, record_content = get_zone_record_identifier(domain)
     if not success:
