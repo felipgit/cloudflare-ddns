@@ -11,9 +11,10 @@ from datetime import datetime
 #logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
+
+# Basic Auth setup
 app.config['BASIC_AUTH_USERNAME'] = os.getenv('APP_USERNAME')
 app.config['BASIC_AUTH_PASSWORD'] = os.getenv('APP_PASSWORD')
-
 basic_auth = BasicAuth(app)
 
 # PostgreSQL database configuration
