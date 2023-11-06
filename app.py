@@ -67,7 +67,7 @@ def generate_uuid():
 # Function to add a new domain and generate a UUID
 def add_domain_to_db(domain):
     # Check if the domain already exists
-    conn = psycopg2.connect(os.getenv("DATABASE_URI"))
+    conn = psycopg2.connect(DATABASE_URI)
     cur = conn.cursor()
 
     cur.execute("SELECT domain FROM ddns WHERE domain = %s", (domain,))
