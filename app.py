@@ -182,7 +182,7 @@ def update_ddns():
 def add_domain():
     domain = request.args.get("domain")
     if not domain:
-        return jsonify({"status": False, "message": "Domain is missing"}), 400
+        return jsonify({"status": False, "message": "Domain input is missing"}), 400
 
     response, status_code = add_domain_to_db(domain)
     return response, status_code
