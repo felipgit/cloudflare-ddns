@@ -22,9 +22,13 @@ Before you begin, make sure you have the following prerequisites in place:
     ```
 2. Add a domain to the database via:
     ```bash
-    curl https://ddns.example.com/add_domain?domain=sub.example.com
+    curl -u "user:pass" https://ddns.example.com/add_domain?domain=sub.example.com
     ```
 3. Copy the provided token and call an update:
     ```bash
     curl https://ddns.example.com/update?domain=sub.example.com&ip=127.0.0.1&token=tokenprovidedfrombefore
+    ```
+4. To list domains and tokens:
+    ```bash
+    curl -u "user:pass" https://ddns.example.com/list
     ```
