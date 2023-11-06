@@ -90,6 +90,30 @@ def add_domain_to_db(domain):
         conn.rollback()
         conn.close()
         return jsonify({"status": False, "message": str(e)}), 500
+def list_domain_from_db():
+    try:
+        conn = psycopg2.connect(DATABASE_URI)
+        cur = conn.cursor()
+
+        # Fetch the domains, tokens, IPs, and last updated timestamps from the database
+        cur.execute("SELECT domain, token, ip, updated FROM ddns")
+        rows = cur.fetchall()
+
+        # Create a list of dictionaries containing the fetched data
+        domain_list = []
+        for row in rows:
+            domain, token, ip, updated = row
+            domain_list.append({
+                "domain": domain,
+                "token": token,
+                "ip": ip,
+                "updated": updated.strftime("%Y-%m-%d %H:%M:%S") if updated else None
+            })
+
+        conn.close()
+        return jsonify({"status": True, "message": domain_list})
+    except Exception as e:
+        return jsonify({"status": False, "message": str(e)})
 
 def update_cloudflare_dns(domain, new_ip):
     success, record_identifier, record_content = get_zone_record_identifier(domain)
@@ -191,7 +215,7 @@ def add_domain():
 @app.route("/list", methods=["GET"])
 @basic_auth.required
 def list_domains():
-    return jsonify({"status": True, "message": "LIST OK"})
+    return list_domain_from_db()
 
 # Route to add list current domains with no secrets
 @app.route("/delete_domain", methods=["GET"])
